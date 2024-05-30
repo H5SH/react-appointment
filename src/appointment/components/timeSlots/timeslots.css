@@ -1,0 +1,28 @@
+
+.timeInputs{
+    border: none;
+    border-color: transparent;
+    border-width: 20px;
+    color: white;
+    text-decoration: none;
+}
+
+/* page color: #f1f1f4 */
+
+.timeInputs:hover {
+    border: 1px solid #ccc;
+    color: rgb(70, 70, 183);
+    /* padding: 5px; */
+}
+
+.timeLabel{
+    border: 1px solid #ccc;
+    color: rgb(70, 70, 183);
+    padding: 5px;
+}
+
+.slotsdiv {
+    flex: auto;
+    flex-direction: row;
+}
+
