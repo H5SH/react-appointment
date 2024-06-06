@@ -1,26 +1,17 @@
 import { DrawerHeader, DrawerFooter, SubmitButton } from "../../../../../components/helpers/utilities";
-import { useDispatch, useSelector } from "react-redux"
+import { useSelector } from "react-redux"
 import { yyyy_mm_dd } from "../data"
 import { useAppointmentContext } from "../../settingContext";
 import { InertiaForm, LabelField, LabeledDropdown, Form, isActiveDataTypeSwitch, updateOrCreate, LabelTextArea } from "../../../../../components/helpers/InertiaForm";
 import { initialValues, reasonsForVisit } from "./initialValues";
-import { toast } from "react-toastify";
-import { closeDrawer, openDrawer } from "../../../../../components/assets/js/_DrawerComponents";
+import ApiErrorMessages from "../../../../../components/helpers/ApiErrorMessage";
 
 
 function AppointmentForm() {
 
-    const { appointmentDate, patients, appointmentTime, appointmentDay, appointmentProvider, appointmentLocation, appointmentDateWeek, setRefresh } = useAppointmentContext()
+    const { appointmentDate, patients, appointmentTime, appointmentProvider, appointmentLocation } = useAppointmentContext()
 
     const appointment = useSelector(state => state.appointment?.payload)
-
-    function Filter(data, id) {
-        const value = data.filter(da => {
-            if (da.id === id)
-                return da
-        })
-        return value[0]
-    }
 
     return (
         <div
@@ -46,21 +37,17 @@ function AppointmentForm() {
                     }}
                     onSubmit={(data) => {
 
-                        updateOrCreate('appointment', isActiveDataTypeSwitch(data), appointment ? true : false,
-                            () => {
-                                toast.success('Appointment Created')
-                                closeDrawer('kt-drawer-appointment')
-
-                            },()=>{},
-                            () => {
-                                toast.success('Appointment Updated')
-                                closeDrawer('kt-drawer-appointment')
-                            },()=>{})
+                        updateOrCreate('/appointment', {
+                            ...data,
+                            status: data.status === 'Active' ? 1 : 0
+                        }, appointment ? true : false,
+                        null,null,null,null, true)
                     }}
                     enableReInitialization={true}
                 >
                     {({ data, setData, errors, handleSubmit }) => (
                         <>
+                        <ApiErrorMessages errormsg={errors} errorcheck={JSON.stringify(errors) !== '{}'} />
                             <div className='card-body' id='kt-drawer-appointment-drawer-body'>
                                 <Form>
                                     <div className="row mb-5">

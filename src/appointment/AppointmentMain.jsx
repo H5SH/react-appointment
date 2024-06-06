@@ -1,126 +1,149 @@
+import 'react-calendar/dist/Calendar.css';
 import TimeSlotDay from './components/timeSlots/timeSlotDays/TimeSlotDay';
 import TimeSlotWeek from './components/timeSlots/TimeSlotWeek';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Calendar from "react-calendar";
-import 'react-calendar/dist/Calendar.css';
-import { days, groupAppointmentsByTime, getNext7Days, groupAppointmentsByDateTime } from './components/data';
+import { days, groupAppointmentsByTime, getNext7Days, groupAppointmentsByDateTime, yyyy_mm_dd, appointmentsFilter, prefixDays } from './components/data';
 import AppointmentForm from './components/AppointmentForm/AppointmentForm';
 import AppointmentHeader from './AppointmentHeader';
 import { times, skips } from './components/data'
-import { PageTitle } from '../../../components/layout/core/PageData';
 import LocationDropdown from './components/LocationDropdown';
 import ProvidersDropdown from './components/ProvidersDropdown';
 import { useAppointmentContext } from './settingContext';
 import { openDrawer } from '../../../components/assets/js/_DrawerComponents';
 import { addAppointment } from '../../redux/slice';
 import { useDispatch } from 'react-redux';
-import { Toolbar } from '../../../components/layout/components/toolbar/Toolbar';
+import { router } from '@inertiajs/react';
+import ApiErrorMessages from '../../../components/helpers/ApiErrorMessage';
 
 
-function AppointmentMain({ providers, locations, patients, appointments }) {
+function AppointmentMain({ schedules, providers = [{id:0}], locations = [{id:0}], patients = [{id:0}], appointments = [] }) {
 
-    const { setPatients, setProviders, setLocations, appointmentDate, setAppointmentDate, appointmentProvider, appointmentLocation } = useAppointmentContext()
-    setPatients(patients)
-    setProviders(providers)
-    setLocations(locations)
-    const [showWeeks, setShowWeeks] = useState(false)
+    const { showWeeks, setShowWeeks, setPatients, setProviders, setLocations, appointmentDate, setAppointmentDate, appointmentProvider, setAppointmentProvider, setAppointmentLocation, appointmentLocation } = useAppointmentContext()
+    patients && setPatients(patients)
+    providers && setProviders(providers)
+    locations && setLocations(locations)
     const [providerAppointments, setProviderAppointments] = useState()
+    const [unblockTime, setUnblockTime] = useState({
+        from: '',
+        to: ''
+    })
     const [showSideBar, setShowSideBar] = useState(true)
+    const [error, setError] = useState({})
     const weekDates = getNext7Days(appointmentDate)
-    appointments?.sort((a, b)=> a.appointment_time.localeCompare(b.appointment_time))
-    const Appointments = showWeeks ? groupAppointmentsByDateTime(appointments):groupAppointmentsByTime(appointments)
     const dispatch = useDispatch()
 
     const slots = times(8, 17, 15)
     const gaps = skips(15)
 
-    function appointmentsFilter() {
-        // let filter = showWeeks ? {
-        //     "start_date" : yyyy_mm_dd(appointmentDate),
-        //     "end_date" : yyyy_mm_dd(weekDates[weekDates.length - 1]) 
-        // }:{
-        //     "appointment_date": yyyy_mm_dd(appointmentDate)
-        // }
-        // if(appointmentLocation.id){
-        //     filter = {
-        //         ...filter,
-        //         'facility': appointmentLocation.id
-        //     }
-        // }
-        // if(appointmentProvider.id){
-        //     filter = {
-        //         ...filter,
-        //         'provider': appointmentProvider.id
-        //     }
-        // }
-        // return filter
-    }
+    const Providers = [
+        {
+            first_name: 'All', last_name:'', id: 0
+        },
+        ...providers
+    ]
+
+    const Locations = [
+        {
+            name: 'All', id: 0
+        },
+        ...locations
+    ]
+
 
     function editAppointment(appointment) {
         dispatch(addAppointment(appointment))
-     }
-
-    async function getProviderAppointments() {
-        // try {
-        //     const response = await getAppointmentReq(appointmentsFilter())
-        //     if (response.data.data) {
-
-        //         response.data.data.sort((a, b) => {
-        //             return a.appointment_time.localeCompare(b.appointment_time);
-        //         });
-
-        //         console.log(response.data.data)
-        //         console.log(groupAppointmentsByDateTime(response.data.data))
-        //         setProviderAppointments(showWeeks ? groupAppointmentsByDateTime(response.data.data) :groupAppointmentsByTime(response.data.data))
-        //         setRefresh(false)
-        //     }
-
-        // } catch (err) {
-        //     console.log(err)
-        //     toast.error('Failed To Load Appointment')
-        // }
     }
 
+    function getProviderAppointments() {
+        appointments?.sort((a, b) => {
+            return a.appointment_time.localeCompare(b.appointment_time);
+        })
+        appointments && setProviderAppointments(showWeeks ? groupAppointmentsByDateTime(appointments) : groupAppointmentsByTime(appointments))
+    }
+
+    function providerSchedule(date){
+        const providerSchedule = schedules.filter(schedule => {
+            if(schedule.provider_id === appointmentProvider?.id)
+                return schedule
+        })
+        const day = prefixDays[date.getDay()]
+        const schedule = providerSchedule[0]?.schedule && JSON.parse(providerSchedule[0]?.schedule)
+        if(providerSchedule[0]?.schedule && schedule[day]){
+            setError({})
+            setUnblockTime({
+                from: schedule[day].From,
+                to: schedule[day].To
+            })
+        }else if(appointmentProvider.id){
+            setError({[`${appointmentProvider.first_name} ${appointmentProvider.last_name}`]: `Is Not Available on ${day}`})
+        }
+
+    }
+    console.log(unblockTime)
+
+    useEffect(() => {
+        getProviderAppointments()
+        schedules && providerSchedule(appointmentDate)
+    }, [appointments])
 
     return (
         <div className='card bg-light-primary overflow-scroll'>
-            {/* <Toolbar>
-                <button
-                onClick={()=> console.log('toolbar clicked')}
-                className='btn btn-primary'
-                >
-                    Tool Button
-                </button>
-            <PageTitle>Appment</PageTitle>
-            </Toolbar> */}
             <AppointmentForm />
             <AppointmentHeader
-                    showSideBar={showSideBar}
-                    setShowSideBar={setShowSideBar}
-                    getProviderAppointments={getProviderAppointments}
-                    showWeeks={showWeeks}
-                    setShowWeeks={setShowWeeks}
-                    appointmentDate={appointmentDate}
-                    first={weekDates && weekDates[0]}
-                    last={weekDates && weekDates[weekDates.length - 1]}
-                />
+                showSideBar={showSideBar}
+                setShowSideBar={setShowSideBar}
+                appointmentLocation={appointmentLocation}
+                appointmentProvider={appointmentProvider}
+                getProviderAppointments={getProviderAppointments}
+                editAppointment={editAppointment}
+                showWeeks={showWeeks}
+                weekDates={weekDates}
+                setShowWeeks={setShowWeeks}
+                appointmentDate={appointmentDate}
+                first={weekDates && weekDates[0]}
+                last={weekDates && weekDates[weekDates.length - 1]}
+            />
             <div className='row p-2'>
+                <ApiErrorMessages errormsg={error} errorcheck={JSON.stringify(error) !== '{}'} />
                 {showSideBar &&
                     <div className='col-3'>
                         <div className="card">
                             <div className="card-body d-flex flex-column px-9 pt-6 pb-8">
-                                <Calendar onChange={setAppointmentDate} value={appointmentDate} className='border border-white fs-7' />
+                                <Calendar onChange={(date) => {
+                                    router.get('/appointment',
+                                        appointmentsFilter(showWeeks, appointmentLocation, appointmentProvider, date, weekDates),
+                                        {
+                                            preserveScroll: true,
+                                            preserveState: true
+                                        })
+                                    setAppointmentDate(date)
+                                }} value={appointmentDate} className='border border-white fs-7' />
                             </div>
                         </div>
                         <div className="card my-3">
                             <div className="card-body d-flex flex-column px-9 pt-6 pb-8">
                                 <div className="mb-10 fv-row">
                                     <label className="form-label mb-3">Location</label>
-                                    {locations && <LocationDropdown locations={locations} />}
+                                    {locations && <LocationDropdown locations={Locations} weekDates={weekDates} />}
                                 </div>
                                 <div className="mb-10 fv-row">
                                     <label className="form-label mb-3">Providers</label>
-                                    {providers && <ProvidersDropdown providers={providers} />}
+                                    {providers && <ProvidersDropdown providers={Providers} weekDates={weekDates} />}
+                                </div>
+                                <div className="mb-10 fv-row">
+                                    <button onClick={()=> {
+                                        router.get('/appointment', 
+                                        appointmentsFilter(showWeeks, Locations[0], Providers[0], appointmentDate, weekDates), 
+                                    {
+                                        preserveScroll: true,
+                                        preserveState: true
+                                    })
+                                        setAppointmentProvider(Providers[0])
+                                        setAppointmentLocation(Locations[0])
+                                    }} className='btn btn-primary'>
+                                        Clear
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -132,22 +155,14 @@ function AppointmentMain({ providers, locations, patients, appointments }) {
                             <h3 className="card-title align-items-start flex-column">
                                 <span className="card-label fw-bold fs-3 mb-1">{`${appointmentProvider.first_name} ${appointmentProvider.last_name}`}</span>
                             </h3>
-                            <div className="card-toolbar" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" title="Click to add a user">
-                                <a href="#" className="btn btn-sm btn-light-primary" id='kt_appointment_toggle' onClick={() => {
-                                    openDrawer('kt-drawer-appointment')
-                                    editAppointment(null)
-                                    }}>
-                                    <i className="ki-duotone ki-plus fs-3"></i>New Appointment
-                                </a>
-                            </div>
                         </div>
                         <div className="card-body d-flex flex-column px-8 py-0">
                             {showWeeks ?
                                 <>
-                                    <TimeSlotWeek setShowWeeks={setShowWeeks} skip={15} slots={slots} gaps={gaps} editAppointment={editAppointment} providerAppointments={Appointments} weekDates={weekDates} />
+                                    <TimeSlotWeek setError={setError} setShowWeeks={setShowWeeks} skip={15} slots={slots} gaps={gaps} editAppointment={editAppointment} providerAppointments={providerAppointments} weekDates={weekDates} />
                                 </> :
                                 <>
-                                    <TimeSlotDay skip={15} day={days[appointmentDate.getDay()]} slots={slots} gaps={gaps} appoitments={Appointments} editAppointment={editAppointment} />
+                                    <TimeSlotDay unblockTime={unblockTime} setError={setError} skip={15} day={days[appointmentDate.getDay()]} slots={slots} gaps={gaps} appoitments={providerAppointments} editAppointment={editAppointment} />
                                 </>
                             }
                         </div>

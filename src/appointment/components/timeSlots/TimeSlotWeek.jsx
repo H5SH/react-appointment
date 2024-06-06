@@ -1,6 +1,6 @@
 import { prefixDays, providerAppointmentTimeCompare, yyyy_mm_dd, dateComparer } from '../data'
 import { pad } from '../../../../../components/helpers/utilities'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './timeslots.css'
 import { useAppointmentContext } from '../../settingContext'
 import { updateOrCreate } from '../../../../../components/helpers/InertiaForm'
@@ -25,7 +25,7 @@ function TimeSlotWeek({ setShowWeeks, skip = 15, editAppointment, slots = [], ga
                 ...draggedData.appointment,
                 appointment_time: draggedData.time,
                 appointment_date: draggedData.date
-            }, true, '', '', 'Appointment Updated', 'Failed To Update')
+            }, true, null,null, null, null, true)
             setDraggedData({
                 time: '',
                 date: '',
@@ -52,8 +52,8 @@ function TimeSlotWeek({ setShowWeeks, skip = 15, editAppointment, slots = [], ga
                 ))}
             </div>
 
-            {slots.map((time) => (
-                <>
+            {slots.map((time, index) => (
+                <React.Fragment key={index}>
                     {gaps?.map((gap, gapindex) => (
                         <div className='row'>
                             <div key={`${time}:${gap}`} className='col-1 text-center border-end border-info p-2' onClick={() => {
@@ -68,8 +68,8 @@ function TimeSlotWeek({ setShowWeeks, skip = 15, editAppointment, slots = [], ga
                                     </div>
                                 }
                             </div>
-                            {weekDates.map((day) => (
-                                <>
+                            {weekDates.map((day, index) => (
+                                <React.Fragment key={`${index}:${index}`}>
                                     {providerAppointments[`${yyyy_mm_dd(day)}/${pad(time)}:${pad(gap)}:00`] &&
                                         providerAppointments[`${yyyy_mm_dd(day)}/${pad(time)}:${pad(gap)}:00`][0]
                                         && providerAppointmentTimeCompare(providerAppointments[`${yyyy_mm_dd(day)}/${pad(time)}:${pad(gap)}:00`][0], time, gap)
@@ -131,11 +131,11 @@ function TimeSlotWeek({ setShowWeeks, skip = 15, editAppointment, slots = [], ga
                                             {`${time}:${pad(gap)}`}
                                         </div>
                                     }
-                                </>
+                                </React.Fragment>
                             ))}
                         </div>
                     ))}
-                </>
+                </React.Fragment>
             ))}
         </>
     )

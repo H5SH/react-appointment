@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Fragment } from 'react'
 import { providerAppointmentTimeCompare } from '../../data'
 import { pad } from '../../../../../../components/helpers/utilities'
 import '../timeslots.css'
@@ -9,10 +9,10 @@ import { useAppointmentContext } from '../../../settingContext'
 import { updateOrCreate } from '../../../../../../components/helpers/InertiaForm'
 
 function TimeSlotDay({
-    day, skip = 15, appoitments = [], editAppointment, slots, gaps, formOpen
+    day, skip = 15, appoitments = [], editAppointment, slots, gaps, setError, unblockTime
 }) {
 
-    const { setAppointmentTime, setAppointmentDay, appointmentDate, setRefresh } = useAppointmentContext()
+    const { setAppointmentTime, setAppointmentDay, appointmentProvider, appointmentLocation } = useAppointmentContext()
     const [hover, setHover] = useState(-1)
 
     const [draggedDiv, setDraggedDiv] = useState({
@@ -48,7 +48,7 @@ function TimeSlotDay({
             updateOrCreate('/appointment', {
                 ...draggedDiv.appointment,
                 appointment_time: draggedDiv.time,
-            }, true, '', '', 'Appointment Updated', 'Failed To Update')
+            }, true, null, null, null, null, true)
             setDraggedDiv({
                 time: '',
                 appointment: {},
@@ -86,10 +86,11 @@ function TimeSlotDay({
                 </div>
             </div>
 
-            {slots?.map((time) => (
-                <>
+            {slots?.map((time, index) => (
+                <Fragment key={index}>
                     {gaps?.map((gap, gapindex) => (
-                        <div key={`${time}:${gap}`} className='row border bg-white' onClick={() => {
+                        <div key={`${time}:${gap}`} className={`row border ${unblockTime.from <= `${pad(time)}:${pad(gap)}` && unblockTime.to >= `${pad(time)}:${pad(gap)}` ? 'bg-white':'bg-secondary'} bg-white`} onClick={() => {
+
                             setAppointmentTime({ time: `${pad(time)}:${pad(gap)}`, skip: skip })
                             setAppointmentDay(day)
                         }}
@@ -111,7 +112,7 @@ function TimeSlotDay({
 
                                 <div className="col-11">
                                     {appoitments[`${pad(time)}:${pad(gap)}`].map((appoitment, index) => (
-                                        <ProviderDataRow draggedDiv={draggedDiv} setDraggedDiv={setDraggedDiv} provider={appoitment} time={time} gap={gap} callBack={() => editAppointment(appoitment)} index={index} key={index}/>
+                                        <ProviderDataRow draggedDiv={draggedDiv} setDraggedDiv={setDraggedDiv} provider={appoitment} time={time} gap={gap} callBack={() => editAppointment(appoitment)} index={index} key={index} />
                                     ))}
                                 </div>
 
@@ -123,7 +124,7 @@ function TimeSlotDay({
                                     onDragExit={() => {
                                         setHover(-1)
                                     }}
-                                    onDragOver={(e)=> {
+                                    onDragOver={(e) => {
                                         e.preventDefault()
                                     }}
                                     onDrop={() => {
@@ -139,16 +140,29 @@ function TimeSlotDay({
                                 >
                                     <div className="timeInputs"
                                         onClick={() => {
-                                            openDrawer('kt-drawer-appointment')
-                                            editAppointment(null)
+                                            if (appointmentProvider.id === 0) {
+                                                setError({
+                                                    provider: 'Provider Must be Selected'
+                                                })
+                                            } else if (appointmentLocation.id === 0) {
+                                                setError({
+                                                    location: 'Location Must be Selected'
+                                                })
+                                            } else if(unblockTime.from <= `${pad(time)}:${pad(gap)}` && unblockTime.to >= `${pad(time)}:${pad(gap)}`){
+                                                openDrawer('kt-drawer-appointment')
+                                                editAppointment(null)
+                                                setError({})
+                                            }
                                         }}>
-                                        {`${time}:${pad(gap)}`}
+                                        {unblockTime.from <= `${pad(time)}:${pad(gap)}` && unblockTime.to >= `${pad(time)}:${pad(gap)}` ?
+                                        `${time}:${pad(gap)}`: ''
+                                        }
                                     </div>
                                 </div>
                             }
                         </div >
                     ))}
-                </>
+                </Fragment>
             ))
             }
         </>

@@ -185,12 +185,34 @@ function groupAppointmentsByDateTime(appointments) {
     }, {});
 }
 
+function appointmentsFilter(showWeeks, appointmentLocation, appointmentProvider, appointmentDate, weekDates) {
+    let filter = showWeeks ? {
+        "start_date": yyyy_mm_dd(appointmentDate),
+        "end_date": yyyy_mm_dd(weekDates[weekDates.length - 1])
+    } : {
+        "appointment_date": yyyy_mm_dd(appointmentDate)
+    }
+    if (appointmentLocation.id) {
+        filter = {
+            ...filter,
+            'location': appointmentLocation.id
+        }
+    }
+    if (appointmentProvider.id) {
+        filter = {
+            ...filter,
+            'provider': appointmentProvider.id
+        }
+    }
+    return filter
+}
+
 
 
 export {
     days, months, times, prefixDays, skips, prefixMonths, providerAppointment,
     timeComparer, providerAppointmentTimeCompare, timeSlotsAndGaps, dateComparer,
     yyyy_mm_dd, dayFinder, dayComparer, getNext7Days, getFullWeekDates, groupAppointmentsByTime,
-    groupAppointmentsByDateTime
+    groupAppointmentsByDateTime, appointmentsFilter
 }
 

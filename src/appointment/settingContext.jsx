@@ -1,7 +1,5 @@
 import { useContext, createContext, useState } from "react";
 
-
-
 const AppointmentContext = createContext()
 
 export function useAppointmentContext() {
@@ -19,9 +17,14 @@ export function AppointmentProvider({ children }) {
     const [providers, setProviders] = useState(null)
     const [locations, setLocations] = useState(null)
     const [patients, setPatients] = useState(null)
+    const [showWeeks, setShowWeeks] = useState(false)
+
 
     return (
         <AppointmentContext.Provider value={{
+            showWeeks,
+            setShowWeeks,
+
             patients,
             setPatients,
 
