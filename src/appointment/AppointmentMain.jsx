@@ -3,13 +3,10 @@ import TimeSlotDay from './components/timeSlots/timeSlotDays/TimeSlotDay';
 import TimeSlotWeek from './components/timeSlots/TimeSlotWeek';
 import { useState } from 'react';
 import Calendar from "react-calendar";
-import { days, getNext7Days, appointmentsFilter } from './components/data';
-import AppointmentForm from './components/AppointmentForm/AppointmentForm';
+import { days, getNext7Days } from './components/data';
 import AppointmentHeader from './AppointmentHeader';
 import { times, skips } from './components/data'
 import { useAppointmentContext } from './settingContext';
-import { router } from '@inertiajs/react';
-import ApiErrorMessages from '../../../components/helpers/ApiErrorMessage';
 
 
 function AppointmentMain({ appointments = [] }) {
@@ -23,7 +20,6 @@ function AppointmentMain({ appointments = [] }) {
 
     return (
         <div className='card bg-light-primary overflow-scroll'>
-            <AppointmentForm />
             <AppointmentHeader
                 showSideBar={showSideBar}
                 setShowSideBar={setShowSideBar}
@@ -35,18 +31,11 @@ function AppointmentMain({ appointments = [] }) {
                 last={weekDates && weekDates[weekDates.length - 1]}
             />
             <div className='row p-2'>
-                <ApiErrorMessages errormsg={error} errorcheck={JSON.stringify(error) !== '{}'} />
                 {showSideBar &&
                     <div className='col-3'>
                         <div className="card">
                             <div className="card-body d-flex flex-column px-9 pt-6 pb-8">
                                 <Calendar onChange={(date) => {
-                                    router.get('/appointment',
-                                        appointmentsFilter(showWeeks, appointmentLocation, appointmentProvider, date, weekDates),
-                                        {
-                                            preserveScroll: true,
-                                            preserveState: true
-                                        })
                                     setAppointmentDate(date)
                                 }} value={appointmentDate} className='border border-white fs-7' />
                             </div>

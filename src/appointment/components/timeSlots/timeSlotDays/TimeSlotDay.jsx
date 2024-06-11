@@ -3,16 +3,15 @@ import { providerAppointmentTimeCompare } from '../../data'
 import { pad } from '../../../../../../components/helpers/utilities'
 import '../timeslots.css'
 import ProviderDataRow from './ProviderDataRow'
-import { useDispatch } from 'react-redux'
 import { openDrawer } from '../../../../../../components/assets/js/_DrawerComponents'
 import { useAppointmentContext } from '../../../settingContext'
 import { updateOrCreate } from '../../../../../../components/helpers/InertiaForm'
 
 function TimeSlotDay({
-    day, skip = 15, appoitments = [], editAppointment, slots, gaps, setError, unblockTime
+    day, skip = 15, appoitments = [], editAppointment, slots, gaps, unblockTime
 }) {
 
-    const { setAppointmentTime, setAppointmentDay, appointmentProvider, appointmentLocation } = useAppointmentContext()
+    const { setAppointmentTime, setAppointmentDay } = useAppointmentContext()
     const [hover, setHover] = useState(-1)
 
     const [draggedDiv, setDraggedDiv] = useState({
@@ -20,28 +19,6 @@ function TimeSlotDay({
         appointment: {},
         droped: false
     })
-
-    const dispatch = useDispatch()
-
-    async function updateAppointmentTime() {
-        // try{
-        //     const response = await updateAppointmentReq(draggedDiv.appointment.id, {
-        //         ...draggedDiv.appointment,
-        //         appointment_time: draggedDiv.time
-        //     })
-        //     if(response.data.data){
-        //         toast.success(response.data.message)
-        //         setDraggedDiv({
-        //             time: '',
-        //             appointment: {},
-        //             drop: false
-        //         })
-        //     }
-        // }catch(err){
-        //     console.log(err)
-        //     toast.error("Failed To Load Please Try again")
-        // }
-    }
 
     useEffect(() => {
         if (draggedDiv.droped) {
@@ -89,7 +66,7 @@ function TimeSlotDay({
             {slots?.map((time, index) => (
                 <Fragment key={index}>
                     {gaps?.map((gap, gapindex) => (
-                        <div key={`${time}:${gap}`} className={`row border ${unblockTime.from <= `${pad(time)}:${pad(gap)}` && unblockTime.to >= `${pad(time)}:${pad(gap)}` ? 'bg-white':'bg-secondary'} bg-white`} onClick={() => {
+                        <div key={`${time}:${gap}`} className={`row border ${unblockTime.from <= `${pad(time)}:${pad(gap)}` && unblockTime.to >= `${pad(time)}:${pad(gap)}` ? 'bg-white' : 'bg-secondary'} bg-white`} onClick={() => {
 
                             setAppointmentTime({ time: `${pad(time)}:${pad(gap)}`, skip: skip })
                             setAppointmentDay(day)
@@ -140,22 +117,9 @@ function TimeSlotDay({
                                 >
                                     <div className="timeInputs"
                                         onClick={() => {
-                                            if (appointmentProvider.id === 0) {
-                                                setError({
-                                                    provider: 'Provider Must be Selected'
-                                                })
-                                            } else if (appointmentLocation.id === 0) {
-                                                setError({
-                                                    location: 'Location Must be Selected'
-                                                })
-                                            } else if(unblockTime.from <= `${pad(time)}:${pad(gap)}` && unblockTime.to >= `${pad(time)}:${pad(gap)}`){
-                                                openDrawer('kt-drawer-appointment')
-                                                editAppointment(null)
-                                                setError({})
-                                            }
                                         }}>
                                         {unblockTime.from <= `${pad(time)}:${pad(gap)}` && unblockTime.to >= `${pad(time)}:${pad(gap)}` ?
-                                        `${time}:${pad(gap)}`: ''
+                                            `${time}:${pad(gap)}` : ''
                                         }
                                     </div>
                                 </div>

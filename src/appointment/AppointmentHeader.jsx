@@ -1,6 +1,3 @@
-import { router } from "@inertiajs/react"
-import { Toolbar } from "../../../components/layout/components/toolbar/Toolbar"
-import { PageTitle } from "../../../components/layout/core/PageData"
 import { months, prefixMonths, prefixDays } from "./components/data"
 
 function AppointmentHeader({
@@ -15,14 +12,10 @@ function AppointmentHeader({
 }) {
 
     return (
-        <Toolbar>
-
-            <PageTitle>Appointments</PageTitle>
-
+        <>
             <div className="card-toolbar" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" title="Click to Make Appointment">
                 <a href="#" className="btn btn-sm btn-light-primary" id='kt_appointment_toggle' onClick={() => {
                     editAppointment(null)
-                    router.get('/appointment/create')
                 }}>
                     <i className="ki-duotone ki-plus fs-3"></i>New Appointment
                 </a>
@@ -46,7 +39,7 @@ function AppointmentHeader({
 
             <button onClick={() => setShowWeeks(false)} className={`btn btn-light ${!showWeeks && 'active'} border border-1 rounded rounded-start`}>Days</button>  &nbsp; &nbsp;
             <button onClick={() => setShowWeeks(true)} className={`btn btn-light ${showWeeks && 'active'} border border-1 rounded rounded-end me-2`}>Week</button>
-        </Toolbar>
+        </>
     )
 }
 
