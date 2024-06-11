@@ -44,11 +44,6 @@ function AppointmentMain({ appointments = [] }) {
                 }
                 <div className={`${showSideBar ? 'col-9' : 'col-12'} p-1`}>
                     <div className="card">
-                        <div className="card-header border-0">
-                            <h3 className="card-title align-items-start flex-column">
-                                <span className="card-label fw-bold fs-3 mb-1">{`${appointmentProvider.first_name} ${appointmentProvider.last_name}`}</span>
-                            </h3>
-                        </div>
                         <div className="card-body d-flex flex-column px-8 py-0">
                             {showWeeks ?
                                 <TimeSlotWeek setError={setError} setShowWeeks={setShowWeeks} skip={15} slots={slots} gaps={gaps} weekDates={weekDates} />

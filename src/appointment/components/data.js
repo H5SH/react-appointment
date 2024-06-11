@@ -1,4 +1,7 @@
-import { pad } from "../../../../components/helpers/utilities";
+
+const pad = (d) => {
+    return d < 10 ? `0${d}`:d
+}
 
 const days = [
     'Sunday',
@@ -213,6 +216,6 @@ export {
     days, months, times, prefixDays, skips, prefixMonths, providerAppointment,
     timeComparer, providerAppointmentTimeCompare, timeSlotsAndGaps, dateComparer,
     yyyy_mm_dd, dayFinder, dayComparer, getNext7Days, getFullWeekDates, groupAppointmentsByTime,
-    groupAppointmentsByDateTime, appointmentsFilter
+    groupAppointmentsByDateTime, appointmentsFilter, pad
 }
 

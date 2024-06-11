@@ -1,10 +1,7 @@
-import { prefixDays, providerAppointmentTimeCompare, yyyy_mm_dd, dateComparer } from '../data'
-import { pad } from '../../../../../components/helpers/utilities'
-import React, { useEffect, useState } from 'react'
 import './timeslots.css'
+import { prefixDays, providerAppointmentTimeCompare, yyyy_mm_dd, dateComparer, pad } from '../data'
+import React, { useEffect, useState } from 'react'
 import { useAppointmentContext } from '../../settingContext'
-import { updateOrCreate } from '../../../../../components/helpers/InertiaForm'
-import { openDrawer } from '../../../../../components/assets/js/_DrawerComponents'
 
 
 function TimeSlotWeek({ setShowWeeks, skip = 15, editAppointment, slots = [], gaps = [], providerAppointments = [], weekDates, formOpen }) {
@@ -21,11 +18,6 @@ function TimeSlotWeek({ setShowWeeks, skip = 15, editAppointment, slots = [], ga
 
     useEffect(() => {
         if (draggedData.drop) {
-            updateOrCreate('/appointment', {
-                ...draggedData.appointment,
-                appointment_time: draggedData.time,
-                appointment_date: draggedData.date
-            }, true, null,null, null, null, true)
             setDraggedData({
                 time: '',
                 date: '',
@@ -91,7 +83,6 @@ function TimeSlotWeek({ setShowWeeks, skip = 15, editAppointment, slots = [], ga
                                                     onClick={() => {
                                                         setAppointmentDay(prefixDays[day.getDay()])
                                                         editAppointment(appointment)
-                                                        openDrawer('kt-drawer-appointment')
                                                     }}
                                                     data-toggle="tooltip" data-placement="bottom"
                                                     title={`facility Name: ${appointment.facility_name}, Provider Name: ${appointment.provider_name}`}
@@ -126,7 +117,6 @@ function TimeSlotWeek({ setShowWeeks, skip = 15, editAppointment, slots = [], ga
                                                 setAppointmentDateWeek(day)
                                                 setAppointmentDay(prefixDays[day.getDay()])
                                                 editAppointment(null)
-                                                openDrawer('kt-drawer-appointment')
                                             }}>
                                             {`${time}:${pad(gap)}`}
                                         </div>

@@ -1,11 +1,8 @@
-import { useEffect, useState, Fragment } from 'react'
-import { providerAppointmentTimeCompare } from '../../data'
-import { pad } from '../../../../../../components/helpers/utilities'
 import '../timeslots.css'
+import { useEffect, useState, Fragment } from 'react'
+import { providerAppointmentTimeCompare, pad } from '../../data'
 import ProviderDataRow from './ProviderDataRow'
-import { openDrawer } from '../../../../../../components/assets/js/_DrawerComponents'
 import { useAppointmentContext } from '../../../settingContext'
-import { updateOrCreate } from '../../../../../../components/helpers/InertiaForm'
 
 function TimeSlotDay({
     day, skip = 15, appoitments = [], editAppointment, slots, gaps, unblockTime
@@ -22,10 +19,6 @@ function TimeSlotDay({
 
     useEffect(() => {
         if (draggedDiv.droped) {
-            updateOrCreate('/appointment', {
-                ...draggedDiv.appointment,
-                appointment_time: draggedDiv.time,
-            }, true, null, null, null, null, true)
             setDraggedDiv({
                 time: '',
                 appointment: {},
