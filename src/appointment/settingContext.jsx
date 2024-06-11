@@ -12,36 +12,27 @@ export function AppointmentProvider({ children }) {
     const [appointmentDate, setAppointmentDate] = useState(new Date())
     const [appointmentTime, setAppointmentTime] = useState({ time: '12:00', skip: 0 })
     const [appointmentDay, setAppointmentDay] = useState('')
-    const [appointmentLocation, setAppointmentLocation] = useState('')
-    const [appointmentProvider, setAppointmentProvider] = useState('')
-    const [providers, setProviders] = useState(null)
-    const [locations, setLocations] = useState(null)
-    const [patients, setPatients] = useState(null)
     const [showWeeks, setShowWeeks] = useState(false)
+    const [unblockTime, setUnblockTime] = useState({
+        from: '',
+        to: ''
+    })
+    const [showSideBar, setShowSideBar] = useState(true)
 
 
     return (
         <AppointmentContext.Provider value={{
+            showSideBar, 
+            setShowSideBar,
+
+            unblockTime, 
+            setUnblockTime,
+
             showWeeks,
             setShowWeeks,
 
-            patients,
-            setPatients,
-
-            providers,
-            setProviders,
-
-            locations,
-            setLocations,
-
             appointmentDateWeek,
             setAppointmentDateWeek,
-
-            appointmentLocation,
-            setAppointmentLocation,
-
-            appointmentProvider,
-            setAppointmentProvider,
 
             appointmentDay,
             setAppointmentDay,

@@ -9,7 +9,7 @@ import { reasonsForVisit } from "./components/AppointmentForm/initialValues"
 import { Toolbar } from "../../../components/layout/components/toolbar/Toolbar"
 import { PageTitle } from "../../../components/layout/core/PageData"
 
-const InputDataForm = ({ locations, providers, patients }) => {
+const InputDataForm = ({ locations, providers, patients}) => {
 
     return (
         <div className="card w-100 rounded-0">

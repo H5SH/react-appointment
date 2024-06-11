@@ -1,7 +1,7 @@
 import { router } from "@inertiajs/react"
 import { Toolbar } from "../../../components/layout/components/toolbar/Toolbar"
 import { PageTitle } from "../../../components/layout/core/PageData"
-import { months, prefixMonths, prefixDays, appointmentsFilter } from "./components/data"
+import { months, prefixMonths, prefixDays } from "./components/data"
 
 function AppointmentHeader({
     showWeeks,
@@ -11,22 +11,8 @@ function AppointmentHeader({
     showSideBar,
     last,
     first,
-    getProviderAppointments,
-    appointmentLocation,
-    appointmentProvider,
-    weekDates,
     editAppointment
 }) {
-
-    function handleWeekSwtich(showWeek) {
-        router.get('/appointment',
-            appointmentsFilter(!showWeeks, appointmentLocation, appointmentProvider, appointmentDate, weekDates),
-            {
-                preserveScroll: true,
-                preserveState: true
-            })
-        setShowWeeks(showWeek)
-    }
 
     return (
         <Toolbar>
@@ -46,7 +32,7 @@ function AppointmentHeader({
                 <i className="fas fa-bars fs-2"></i>
             </button>
 
-            <a className="btn btn-primary" onClick={() => getProviderAppointments()}>
+            <a className="btn btn-primary">
                 <i className="bi bi-bootstrap-reboot fs-2"></i>
             </a>
 
@@ -58,8 +44,8 @@ function AppointmentHeader({
                 }
             </span>
 
-            <button onClick={() => handleWeekSwtich(false)} className={`btn btn-light ${!showWeeks && 'active'} border border-1 rounded rounded-start`}>Days</button>  &nbsp; &nbsp;
-            <button onClick={() => handleWeekSwtich(true)} className={`btn btn-light ${showWeeks && 'active'} border border-1 rounded rounded-end me-2`}>Week</button>
+            <button onClick={() => setShowWeeks(false)} className={`btn btn-light ${!showWeeks && 'active'} border border-1 rounded rounded-start`}>Days</button>  &nbsp; &nbsp;
+            <button onClick={() => setShowWeeks(true)} className={`btn btn-light ${showWeeks && 'active'} border border-1 rounded rounded-end me-2`}>Week</button>
         </Toolbar>
     )
 }

@@ -3,7 +3,7 @@ import { AppointmentProvider } from "./settingContext"
 import { useEffect } from "react"
 import { toast } from "react-toastify"
 
-const Index = ({ providers, locations, patients, appointments, success, schedule }) => {
+const Index = ({ appointments }) => {
 
     useEffect(()=>{
         success && toast.success(success)
@@ -11,7 +11,7 @@ const Index = ({ providers, locations, patients, appointments, success, schedule
 
     return (
         <AppointmentProvider>
-            <AppointmentMain schedules={schedule} providers={providers} locations={locations} patients={patients} appointments={appointments} />
+            <AppointmentMain appointments={appointments} />
         </AppointmentProvider>
     )
 }
